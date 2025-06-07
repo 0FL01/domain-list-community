@@ -1,4 +1,4 @@
-name: Build geosite_ru.dat
+name: Build geosite.dat
 on:
   workflow_dispatch:
   push:
@@ -24,36 +24,36 @@ jobs:
           echo "RELEASE_NAME=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
           echo "TAG_NAME=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
         shell: bash
-      - name: Build geosite_ru.dat file
+      - name: Build geosite.dat file
         run: |
           cd code || exit 1
           go run ./ --outputdir=../ --exportlists=category-ru
           cd ../
-          mv dlc.dat geosite_ru.dat
+          mv dlc.dat geosite.dat
           rm -rf code
-      - name: Generate geosite_ru.dat sha256 hash
+      - name: Generate geosite.dat sha256 hash
         run: |
-          sha256sum geosite_ru.dat > geosite_ru.dat.sha256sum
+          sha256sum geosite.dat > geosite.dat.sha256sum
       - name: Generate Zip
         run: |
-          zip -9 geosite_ru.dat.zip geosite_ru.dat
-          sha256sum geosite_ru.dat.zip > geosite_ru.dat.zip.sha256sum
+          zip -9 geosite.dat.zip geosite.dat
+          sha256sum geosite.dat.zip > geosite.dat.zip.sha256sum
       - name: Generate XZ
         run: |
-          xz -z -9 -k geosite_ru.dat
-          sha256sum geosite_ru.dat.xz > geosite_ru.dat.xz.sha256sum
+          xz -z -9 -k geosite.dat
+          sha256sum geosite.dat.xz > geosite.dat.xz.sha256sum
       - name: Git push assets to "release" branch
         run: |
           git init
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b release
-          git add *.txt *.sha256sum geosite_ru.dat geosite_ru.dat.zip geosite_ru.dat.xz
+          git add *.txt *.sha256sum geosite.dat geosite.dat.zip geosite.dat.xz
           git commit -m "${{ env.RELEASE_NAME }}"
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin release
       - name: Release and upload assets
         run: |
-          gh release create ${{ env.TAG_NAME }} --generate-notes --latest --title ${{ env.RELEASE_NAME }} ./geosite_ru.dat ./geosite_ru.dat.*
+          gh release create ${{ env.TAG_NAME }} --generate-notes --latest --title ${{ env.RELEASE_NAME }} ./geosite.dat ./geosite.dat.*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
